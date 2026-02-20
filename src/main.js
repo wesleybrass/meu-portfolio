@@ -159,6 +159,68 @@ function animateSkillBars() {
 }
 
 /* ══════════════════════════════════════
+   PROJECT MODAL
+   ══════════════════════════════════════ */
+const modal = document.getElementById('projectModal');
+const modalBody = document.getElementById('modalBody');
+
+function openModal(project) {
+  const sectionsHtml = project.sections.map(section => `
+    <div class="modal-section">
+      ${section.heading ? `<h3 class="modal-section__heading">${section.heading}</h3>` : ''}
+      ${section.text ? `<p class="modal-section__text">${section.text}</p>` : ''}
+      ${section.image ? `
+        <div class="modal-section__img-wrap">
+          <img src="${section.image}" alt="${section.heading || project.title}" class="modal-section__img" loading="lazy" />
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+
+  modalBody.innerHTML = `
+    <div class="modal-header" style="background:${project.gradient}">
+      <span class="modal-header__icon">${project.icon}</span>
+      <div class="modal-header__info">
+        <span class="project-card__category">${project.category}</span>
+        <h2 class="modal-header__title">${project.title}</h2>
+        ${project.date ? `<span class="modal-header__date">📅 Criado em ${project.date}</span>` : ''}
+      </div>
+    </div>
+    <div class="modal-content">
+      <p class="modal-intro">${project.description}</p>
+      ${project.observations && project.observations !== 'Empty' ? `
+        <div class="modal-observation">
+          <strong>Observações:</strong> ${project.observations}
+        </div>
+      ` : ''}
+      <div class="modal-sections">${sectionsHtml}</div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+  document.body.classList.add('modal-open');
+  modal.focus();
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.classList.remove('modal-open');
+}
+
+// Close on backdrop click
+modal?.addEventListener('click', e => {
+  if (e.target === modal) closeModal();
+});
+
+// Close on ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+});
+
+// Close button
+document.getElementById('modalClose')?.addEventListener('click', closeModal);
+
+/* ══════════════════════════════════════
    RENDER PROJECTS
    ══════════════════════════════════════ */
 function renderProjects() {
@@ -166,11 +228,10 @@ function renderProjects() {
   if (!grid) return;
 
   grid.innerHTML = projects.map(p => `
-    <a
-      href="${p.notionUrl}"
-      target="_blank"
-      rel="noopener"
+    <button
+      type="button"
       class="project-card fade-in"
+      data-id="${p.id}"
       aria-label="Ver projeto: ${p.title}"
     >
       <div class="project-card__visual" style="background:${p.gradient}">${p.icon}</div>
@@ -178,11 +239,19 @@ function renderProjects() {
         <span class="project-card__category">${p.category}</span>
         <h3 class="project-card__title">${p.title}</h3>
         <p class="project-card__desc">${p.description}</p>
-        <span class="project-card__link">Ver no Notion →</span>
+        <span class="project-card__link">Ver detalhes →</span>
       </div>
-    </a>
+    </button>
   `).join('');
+
+  grid.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const project = projects.find(p => p.id === Number(card.dataset.id));
+      if (project) openModal(project);
+    });
+  });
 }
+
 
 /* ══════════════════════════════════════
    SCROLL / FADE ANIMATIONS
