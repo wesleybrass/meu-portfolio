@@ -179,11 +179,13 @@ function openModal(project) {
 
   modalBody.innerHTML = `
     <div class="modal-header" style="background:${project.gradient}">
-      <span class="modal-header__icon">${project.icon}</span>
-      <div class="modal-header__info">
-        <span class="project-card__category">${project.category}</span>
-        <h2 class="modal-header__title">${project.title}</h2>
-        ${project.date ? `<span class="modal-header__date">📅 Criado em ${project.date}</span>` : ''}
+      <span class="project-card__category">${project.category}</span>
+      <div class="modal-header__top">
+        <span class="modal-header__icon">${project.icon}</span>
+        <div class="modal-header__info">
+          <h2 class="modal-header__title">${project.title}</h2>
+          ${project.date ? `<span class="modal-header__date">📅 Criado em ${project.date}</span>` : ''}
+        </div>
       </div>
     </div>
     <div class="modal-content">
